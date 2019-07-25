@@ -1,0 +1,8 @@
+#!/bin/bash
+
+file=$(cat /etc/passwd | grep -v "#")
+while read line
+do
+	IFS=: read login psswd uid groupid uidinfo homedicp cmdshell <<< "$line"
+	echo "$login:$uid:$cmdshell"
+done <<< "$file"

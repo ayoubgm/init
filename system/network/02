@@ -1,0 +1,2 @@
+ifconfig en0 inet | grep broadcast | cut -d ' ' -f6
+ping -c 2 10.12.255.255

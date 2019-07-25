@@ -1,0 +1,31 @@
+#!/bin/bash
+
+file=$(cat /etc/passwd | grep -v "#")
+activeusers=""
+while read line
+do
+	IFS=: read login psswd uid groupid uidinfo homedicp cmdshell <<< "$line"
+	if [ $uid -ge "1000" ]; then
+		activeusers+="$login:$uid:$cmdshell "
+	fi
+done <<< "$file"
+if [[ $1 = "-l" ]]; then
+	if [[ $activeusers = "" ]]; then
+		echo "no active users"
+	else
+		echo $activeusers | tr ' ' '\n'
+	fi
+elif [[ $1 = "-d" ]] && [[ -n $2 ]]; then
+	echo $activeusers | tr ' ' '\n' | grep -E "^$2:" >/dev/null && res="found" || res="not found"
+	if [[ $res = "not found" ]]; then
+		echo "username that you want to delete it doesn't exist"
+	else [[ $res = "found" ]]
+		echo "found"
+		sudo pkill -9 -u $2
+		echo "proccess has been killed"
+		sudo deluser $2
+	fi
+else
+	echo "usage : bash script_file [-d] username"
+	echo "	bash script_file [-l]"
+fi
